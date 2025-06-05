@@ -6,6 +6,7 @@ import 'package:weather_app/providers/theme_provider.dart';
 import 'package:weather_app/providers/locale_provider.dart';
 import 'package:weather_app/providers/auth_provider.dart' as myAuth;
 import 'package:weather_app/screens/login_screen.dart';
+import 'safety_instructions_localizations.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -23,14 +24,24 @@ class _SettingScreenState extends State<SettingScreen>
   bool _isUpdating = false;
   late TabController _tabController;
   late VideoPlayerController _videoController;
+  String? _videoError;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this); // Updated to 4 tabs
-    _videoController = VideoPlayerController.asset('assets/videos/alertVideo.mp4')
+    _tabController = TabController(length: 4, vsync: this);
+    _videoController = VideoPlayerController.asset(
+        'assets/videos/alertVideo.mp4')
       ..initialize().then((_) {
-        setState(() {}); // Update UI when video is initialized
+        setState(() {});
+      }).catchError((error, stackTrace) {
+        setState(() {
+          _videoError = error.toString();
+        });
+        print('Video initialization error: $error\nStack trace: $stackTrace');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load video: $error')),
+        );
       });
   }
 
@@ -41,7 +52,7 @@ class _SettingScreenState extends State<SettingScreen>
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     _tabController.dispose();
-    _videoController.dispose(); // Dispose video controller
+    _videoController.dispose();
     super.dispose();
   }
 
@@ -87,7 +98,7 @@ class _SettingScreenState extends State<SettingScreen>
               Tab(text: 'general_settings'.tr()),
               Tab(text: 'update_name'.tr()),
               Tab(text: 'update_password'.tr()),
-              Tab(text: 'video'.tr()), // New Video tab
+              Tab(text: 'video'.tr()),
             ],
           ),
         ),
@@ -169,7 +180,9 @@ class _SettingScreenState extends State<SettingScreen>
                               onChanged: (Locale? newLocale) async {
                                 if (newLocale != null) {
                                   await localeProvider.setLocale(newLocale);
-                                  await context.setLocale(newLocale);
+                                  if (mounted) {
+                                    setState(() {}); // Refresh UI
+                                  }
                                 }
                               },
                               style: TextStyle(
@@ -308,11 +321,9 @@ class _SettingScreenState extends State<SettingScreen>
                                   : () async {
                                       if (_nameController.text.trim().isEmpty) {
                                         ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content:
-                                                  Text('name_required'.tr())),
-                                        );
+                                            .showSnackBar(SnackBar(
+                                          content: Text('name_required'.tr()),
+                                        ));
                                         return;
                                       }
                                       setState(() => _isUpdating = true);
@@ -611,24 +622,36 @@ class _SettingScreenState extends State<SettingScreen>
                             ),
                           ),
                           const SizedBox(height: 20),
-                          _videoController.value.isInitialized
-                              ? AspectRatio(
-                                  aspectRatio: _videoController.value.aspectRatio,
-                                  child: VideoPlayer(_videoController),
+                          _videoError != null
+                              ? Text(
+                                  'Error loading video: $_videoError',
+                                  style: TextStyle(
+                                    color:
+                                        isDark ? Colors.redAccent : Colors.red,
+                                  ),
                                 )
-                              : const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
+                              : _videoController.value.isInitialized
+                                  ? AspectRatio(
+                                      aspectRatio:
+                                          _videoController.value.aspectRatio,
+                                      child: VideoPlayer(_videoController),
+                                    )
+                                  : const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
                           const SizedBox(height: 16),
                           Center(
                             child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _videoController.value.isPlaying
-                                      ? _videoController.pause()
-                                      : _videoController.play();
-                                });
-                              },
+                              onPressed: _videoError != null ||
+                                      !_videoController.value.isInitialized
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        _videoController.value.isPlaying
+                                            ? _videoController.pause()
+                                            : _videoController.play();
+                                      });
+                                    },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
                                     isDark ? Colors.tealAccent : Colors.blue,
@@ -651,6 +674,54 @@ class _SettingScreenState extends State<SettingScreen>
                               ),
                             ),
                           ),
+                          const SizedBox(height: 24),
+                          Text(
+                            SafetyInstructionsLocalizations.of(context)
+                                .safetyInstructionsTitle,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          ...SafetyInstructionsLocalizations.of(context)
+                              .safetyInstructions
+                              .asMap()
+                              .entries
+                              .map((entry) {
+                            final index = entry.key;
+                            final instruction = entry.value;
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${index + 1}. ',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      instruction,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                         ],
                       ),
                     ),

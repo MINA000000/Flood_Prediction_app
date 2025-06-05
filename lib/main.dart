@@ -1,17 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_app/firebase_options.dart';
 import 'package:weather_app/providers/locale_provider.dart';
+import 'package:weather_app/providers/theme_provider.dart';
+import 'package:weather_app/providers/vote_provider.dart';
 import 'package:weather_app/screens/login_screen.dart';
 import 'package:weather_app/master_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:weather_app/providers/weather_provider.dart';
 import 'package:weather_app/providers/auth_provider.dart' as myAuth;
-import 'package:weather_app/providers/theme_provider.dart';
 import 'package:weather_app/screens/admin_support_screen.dart';
-import 'firebase_options.dart';
-import 'package:weather_app/providers/vote_provider.dart';
-
+import 'package:weather_app/screens/safety_instructions_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
@@ -64,10 +64,13 @@ class MyApp extends StatelessWidget {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
-          // Easy localization
-          localizationsDelegates: context.localizationDelegates,
+          // Easy localization and custom localization
+          localizationsDelegates: [
+            ...context.localizationDelegates, // Include easy_localization delegates
+            SafetyInstructionsLocalizations.delegate, // Add custom delegate
+          ],
           supportedLocales: context.supportedLocales,
-          locale: context.locale,
+          locale: Provider.of<LocaleProvider>(context).locale, // Use LocaleProvider
           // App configuration
           debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
