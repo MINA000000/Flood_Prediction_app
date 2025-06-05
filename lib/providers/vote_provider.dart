@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
@@ -91,8 +92,8 @@ class VoteProvider with ChangeNotifier {
       });
 
       // Update today's flood status with both prediction model data and additional weather data
-      final todayDocRef =
-          _firestore.collection('today_flood_status').doc('current');
+      final dateAgain = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final todayDocRef = _firestore.collection('today_flood_status').doc(dateAgain);
 
       await _firestore.runTransaction((transaction) async {
         final todayDoc = await transaction.get(todayDocRef);
@@ -165,9 +166,10 @@ class VoteProvider with ChangeNotifier {
 
   Future<Map<String, dynamic>?> getTodayVoteStatus() async {
     try {
+      final dateAgain = DateFormat('yyyy-MM-dd').format(DateTime.now());
       final doc = await _firestore
           .collection('today_flood_status')
-          .doc('current')
+          .doc(dateAgain)
           .get();
       return doc.data();
     } catch (e) {
