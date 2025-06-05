@@ -6,7 +6,8 @@ import 'package:weather_app/providers/theme_provider.dart';
 import 'package:weather_app/providers/locale_provider.dart';
 import 'package:weather_app/providers/auth_provider.dart' as myAuth;
 import 'package:weather_app/screens/login_screen.dart';
-import 'safety_instructions_localizations.dart';
+// import 'safety_instructions_localizations.dart';
+import 'flood_status_tab.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -29,9 +30,8 @@ class _SettingScreenState extends State<SettingScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-    _videoController = VideoPlayerController.asset(
-        'assets/videos/alertVideo.mp4')
+    _tabController = TabController(length: 5, vsync: this);
+    _videoController = VideoPlayerController.asset('assets/videos/alertVideo.mp4')
       ..initialize().then((_) {
         setState(() {});
       }).catchError((error, stackTrace) {
@@ -66,8 +66,7 @@ class _SettingScreenState extends State<SettingScreen>
     final isDark = theme.brightness == Brightness.dark;
     final themeProvider = Provider.of<ThemeProvider>(context);
     final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-    final authProvider =
-        Provider.of<myAuth.AuthProvider>(context, listen: false);
+    final authProvider = Provider.of<myAuth.AuthProvider>(context, listen: false);
     bool isDarkMode = themeProvider.themeMode == ThemeMode.dark;
 
     return Container(
@@ -103,6 +102,7 @@ class _SettingScreenState extends State<SettingScreen>
               Tab(text: 'update_name'.tr()),
               Tab(text: 'update_password'.tr()),
               Tab(text: 'video'.tr()),
+              Tab(text: 'flood_status'.tr()),
             ],
           ),
         ),
@@ -119,8 +119,7 @@ class _SettingScreenState extends State<SettingScreen>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    color:
-                        isDark ? Colors.black54 : Colors.white.withOpacity(0.9),
+                    color: isDark ? Colors.black54 : Colors.white.withOpacity(0.9),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
@@ -142,8 +141,7 @@ class _SettingScreenState extends State<SettingScreen>
                                 onChanged: (value) {
                                   themeProvider.toggleTheme(value);
                                 },
-                                activeColor:
-                                    isDark ? Colors.tealAccent : Colors.blue,
+                                activeColor: isDark ? Colors.tealAccent : Colors.blue,
                                 activeTrackColor: isDark
                                     ? Colors.tealAccent.withOpacity(0.5)
                                     : Colors.blue.withOpacity(0.5),
@@ -185,7 +183,7 @@ class _SettingScreenState extends State<SettingScreen>
                                 if (newLocale != null) {
                                   await localeProvider.setLocale(context, newLocale);
                                   if (mounted) {
-                                    setState(() {}); // Refresh UI
+                                    setState(() {});
                                   }
                                 }
                               },
@@ -193,11 +191,9 @@ class _SettingScreenState extends State<SettingScreen>
                                 color: isDark ? Colors.white : Colors.black87,
                                 fontSize: 16,
                               ),
-                              dropdownColor:
-                                  isDark ? Colors.black87 : Colors.white,
+                              dropdownColor: isDark ? Colors.black87 : Colors.white,
                               underline: const SizedBox(),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -219,12 +215,11 @@ class _SettingScreenState extends State<SettingScreen>
                                 } catch (e) {
                                   if (!mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('logout_failed'.tr())),
+                                    SnackBar(content: Text('logout_failed'.tr())),
                                   );
                                 }
                               },
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.logout,
                                 color: Colors.white,
                               ),
@@ -236,8 +231,7 @@ class _SettingScreenState extends State<SettingScreen>
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    isDark ? Colors.redAccent : Colors.red,
+                                backgroundColor: isDark ? Colors.redAccent : Colors.red,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -267,8 +261,7 @@ class _SettingScreenState extends State<SettingScreen>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    color:
-                        isDark ? Colors.black54 : Colors.white.withOpacity(0.9),
+                    color: isDark ? Colors.black54 : Colors.white.withOpacity(0.9),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
@@ -290,8 +283,7 @@ class _SettingScreenState extends State<SettingScreen>
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color:
-                                      isDark ? Colors.tealAccent : Colors.blue,
+                                  color: isDark ? Colors.tealAccent : Colors.blue,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
@@ -305,8 +297,7 @@ class _SettingScreenState extends State<SettingScreen>
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color:
-                                      isDark ? Colors.tealAccent : Colors.blue,
+                                  color: isDark ? Colors.tealAccent : Colors.blue,
                                   width: 2,
                                 ),
                               ),
@@ -324,39 +315,30 @@ class _SettingScreenState extends State<SettingScreen>
                                   ? null
                                   : () async {
                                       if (_nameController.text.trim().isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text('name_required'.tr()),
-                                        ));
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('name_required'.tr())),
+                                        );
                                         return;
                                       }
                                       setState(() => _isUpdating = true);
                                       try {
                                         await authProvider.updateDisplayName(
                                             _nameController.text.trim());
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content:
-                                                  Text('name_updated'.tr())),
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('name_updated'.tr())),
                                         );
                                         _nameController.clear();
                                       } catch (e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content:
-                                                  Text('update_failed'.tr())),
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('update_failed'.tr())),
                                         );
                                       } finally {
                                         setState(() => _isUpdating = false);
                                       }
                                     },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    isDark ? Colors.tealAccent : Colors.blue,
-                                foregroundColor:
-                                    isDark ? Colors.black : Colors.white,
+                                backgroundColor: isDark ? Colors.tealAccent : Colors.blue,
+                                foregroundColor: isDark ? Colors.black : Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -389,8 +371,7 @@ class _SettingScreenState extends State<SettingScreen>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    color:
-                        isDark ? Colors.black54 : Colors.white.withOpacity(0.9),
+                    color: isDark ? Colors.black54 : Colors.white.withOpacity(0.9),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
@@ -412,8 +393,7 @@ class _SettingScreenState extends State<SettingScreen>
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color:
-                                      isDark ? Colors.tealAccent : Colors.blue,
+                                  color: isDark ? Colors.tealAccent : Colors.blue,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
@@ -427,8 +407,7 @@ class _SettingScreenState extends State<SettingScreen>
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color:
-                                      isDark ? Colors.tealAccent : Colors.blue,
+                                  color: isDark ? Colors.tealAccent : Colors.blue,
                                   width: 2,
                                 ),
                               ),
@@ -448,8 +427,7 @@ class _SettingScreenState extends State<SettingScreen>
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color:
-                                      isDark ? Colors.tealAccent : Colors.blue,
+                                  color: isDark ? Colors.tealAccent : Colors.blue,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
@@ -463,8 +441,7 @@ class _SettingScreenState extends State<SettingScreen>
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color:
-                                      isDark ? Colors.tealAccent : Colors.blue,
+                                  color: isDark ? Colors.tealAccent : Colors.blue,
                                   width: 2,
                                 ),
                               ),
@@ -484,8 +461,7 @@ class _SettingScreenState extends State<SettingScreen>
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color:
-                                      isDark ? Colors.tealAccent : Colors.blue,
+                                  color: isDark ? Colors.tealAccent : Colors.blue,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
@@ -499,8 +475,7 @@ class _SettingScreenState extends State<SettingScreen>
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color:
-                                      isDark ? Colors.tealAccent : Colors.blue,
+                                  color: isDark ? Colors.tealAccent : Colors.blue,
                                   width: 2,
                                 ),
                               ),
@@ -518,26 +493,20 @@ class _SettingScreenState extends State<SettingScreen>
                               onPressed: _isUpdating
                                   ? null
                                   : () async {
-                                      if (_currentPasswordController
-                                              .text.isEmpty ||
+                                      if (_currentPasswordController.text.isEmpty ||
                                           _newPasswordController.text.isEmpty ||
-                                          _confirmPasswordController
-                                              .text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                          _confirmPasswordController.text.isEmpty) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                              content: Text(
-                                                  'all_fields_required'.tr())),
+                                              content: Text('all_fields_required'.tr())),
                                         );
                                         return;
                                       }
                                       if (_newPasswordController.text !=
                                           _confirmPasswordController.text) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                              content: Text(
-                                                  'passwords_dont_match'.tr())),
+                                              content: Text('passwords_dont_match'.tr())),
                                         );
                                         return;
                                       }
@@ -547,26 +516,19 @@ class _SettingScreenState extends State<SettingScreen>
                                           _currentPasswordController.text,
                                           _newPasswordController.text,
                                         );
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                              content: Text(
-                                                  'password_updated'.tr())),
+                                              content: Text('password_updated'.tr())),
                                         );
                                         _currentPasswordController.clear();
                                         _newPasswordController.clear();
                                         _confirmPasswordController.clear();
                                       } catch (e) {
-                                        String errorMessage =
-                                            'update_failed'.tr();
-                                        if (e
-                                            .toString()
-                                            .contains('reauthenticate')) {
-                                          errorMessage =
-                                              'incorrect_current_password'.tr();
+                                        String errorMessage = 'update_failed'.tr();
+                                        if (e.toString().contains('reauthenticate')) {
+                                          errorMessage = 'incorrect_current_password'.tr();
                                         }
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(content: Text(errorMessage)),
                                         );
                                       } finally {
@@ -574,10 +536,8 @@ class _SettingScreenState extends State<SettingScreen>
                                       }
                                     },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    isDark ? Colors.tealAccent : Colors.blue,
-                                foregroundColor:
-                                    isDark ? Colors.black : Colors.white,
+                                backgroundColor: isDark ? Colors.tealAccent : Colors.blue,
+                                foregroundColor: isDark ? Colors.black : Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -610,8 +570,7 @@ class _SettingScreenState extends State<SettingScreen>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    color:
-                        isDark ? Colors.black54 : Colors.white.withOpacity(0.9),
+                    color: isDark ? Colors.black54 : Colors.white.withOpacity(0.9),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
@@ -630,14 +589,12 @@ class _SettingScreenState extends State<SettingScreen>
                               ? Text(
                                   'Error loading video: $_videoError',
                                   style: TextStyle(
-                                    color:
-                                        isDark ? Colors.redAccent : Colors.red,
+                                    color: isDark ? Colors.redAccent : Colors.red,
                                   ),
                                 )
                               : _videoController.value.isInitialized
                                   ? AspectRatio(
-                                      aspectRatio:
-                                          _videoController.value.aspectRatio,
+                                      aspectRatio: _videoController.value.aspectRatio,
                                       child: VideoPlayer(_videoController),
                                     )
                                   : const Center(
@@ -651,16 +608,16 @@ class _SettingScreenState extends State<SettingScreen>
                                   ? null
                                   : () {
                                       setState(() {
-                                        _videoController.value.isPlaying
-                                            ? _videoController.pause()
-                                            : _videoController.play();
+                                        if (_videoController.value.isPlaying) {
+                                          _videoController.pause();
+                                        } else {
+                                          _videoController.play();
+                                        }
                                       });
                                     },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    isDark ? Colors.tealAccent : Colors.blue,
-                                foregroundColor:
-                                    isDark ? Colors.black : Colors.white,
+                                backgroundColor: isDark ? Colors.tealAccent : Colors.blue,
+                                foregroundColor: isDark ? Colors.black : Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -688,7 +645,6 @@ class _SettingScreenState extends State<SettingScreen>
                             ),
                           ),
                           const SizedBox(height: 12),
-
                           ...List.generate(9, (index) {
                             final instruction = 'safety_instructions.${index + 1}'.tr();
                             return Padding(
@@ -716,7 +672,6 @@ class _SettingScreenState extends State<SettingScreen>
                               ),
                             );
                           }),
-
                         ],
                       ),
                     ),
@@ -724,6 +679,8 @@ class _SettingScreenState extends State<SettingScreen>
                 ],
               ),
             ),
+            // Flood Status Tab
+            const FloodStatusTab(),
           ],
         ),
       ),
