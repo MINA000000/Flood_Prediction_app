@@ -2,11 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart'; // Added chewie import
 import 'package:weather_app/providers/theme_provider.dart';
 import 'package:weather_app/providers/locale_provider.dart';
 import 'package:weather_app/providers/auth_provider.dart' as myAuth;
 import 'package:weather_app/screens/login_screen.dart';
-// import 'safety_instructions_localizations.dart';
 import 'flood_status_tab.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -25,6 +25,7 @@ class _SettingScreenState extends State<SettingScreen>
   bool _isUpdating = false;
   late TabController _tabController;
   late VideoPlayerController _videoController;
+  late ChewieController _chewieController; // Added ChewieController
   String? _videoError;
 
   @override
@@ -33,7 +34,36 @@ class _SettingScreenState extends State<SettingScreen>
     _tabController = TabController(length: 5, vsync: this);
     _videoController = VideoPlayerController.asset('assets/videos/alertVideo.mp4')
       ..initialize().then((_) {
-        setState(() {});
+        // Initialize ChewieController after VideoPlayerController is ready
+        setState(() {
+          _chewieController = ChewieController(
+            videoPlayerController: _videoController,
+            autoInitialize: true, // Auto-initialize the video
+            autoPlay: false, // Set to false to match your original play button logic
+            looping: false,
+            errorBuilder: (context, errorMessage) {
+              return Center(
+                child: Text(
+                  'Error loading video: $errorMessage',
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.redAccent
+                        : Colors.red,
+                  ),
+                ),
+              );
+            },
+            // Customize controls to match your theme
+            materialProgressColors: ChewieProgressColors(
+              playedColor: Colors.blue,
+              handleColor: Colors.blueAccent,
+              backgroundColor: Colors.grey,
+              bufferedColor: Colors.grey.withOpacity(0.5),
+            ),
+            placeholder: const Center(child: CircularProgressIndicator()),
+            aspectRatio: _videoController.value.aspectRatio,
+          );
+        });
       }).catchError((error, stackTrace) {
         setState(() {
           _videoError = error.toString();
@@ -53,6 +83,7 @@ class _SettingScreenState extends State<SettingScreen>
     _confirmPasswordController.dispose();
     _tabController.dispose();
     _videoController.dispose();
+    _chewieController.dispose(); // Dispose ChewieController
     super.dispose();
   }
 
@@ -595,7 +626,9 @@ class _SettingScreenState extends State<SettingScreen>
                               : _videoController.value.isInitialized
                                   ? AspectRatio(
                                       aspectRatio: _videoController.value.aspectRatio,
-                                      child: VideoPlayer(_videoController),
+                                      child: Chewie(
+                                        controller: _chewieController, // Use Chewie widget
+                                      ),
                                     )
                                   : const Center(
                                       child: CircularProgressIndicator(),
@@ -610,8 +643,10 @@ class _SettingScreenState extends State<SettingScreen>
                                       setState(() {
                                         if (_videoController.value.isPlaying) {
                                           _videoController.pause();
+                                          _chewieController.pause(); // Sync with Chewie
                                         } else {
                                           _videoController.play();
+                                          _chewieController.play(); // Sync with Chewie
                                         }
                                       });
                                     },
