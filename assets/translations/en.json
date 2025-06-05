@@ -118,5 +118,17 @@
   "forgot_password": "Forgot Password?",
   "video": "Video",
   "play": "Play",
-  "pause": "Pause"
+  "pause": "Pause",
+  "safety_instructions_title": "Safety Instructions",
+  "safety_instructions": {
+    "1": "Stay away from low-lying areas, valleys, and waterways as they are most prone to flooding.",
+    "2": "Do not cross closed or flooded roads or bridges, as the current may be strong and invisible.",
+    "3": "Continuously follow weather forecasts and meteorological warnings.",
+    "4": "Evacuate your home if ordered to do so and head to safe locations or designated shelters.",
+    "5": "Avoid touching or approaching wet or fallen electrical wires to prevent electric shock.",
+    "6": "Turn off electricity, gas, and water sources before leaving the home.",
+    "7": "Avoid driving on flooded roads, as water may reach the engine, causing the vehicle to stall or be swept away by currents.",
+    "8": "Keep emergency supplies such as water, dry food, a flashlight, extra batteries, and emergency medications.",
+    "9": "Stay calm, avoid panic, and keep away from sources of danger."
+  }
 }

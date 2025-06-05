@@ -58,6 +58,10 @@ class _SettingScreenState extends State<SettingScreen>
 
   @override
   Widget build(BuildContext context) {
+    final List<String> instructions = List.generate(
+      9,
+      (index) => 'safety_instructions.${index + 1}'.tr(),
+    );
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -179,7 +183,7 @@ class _SettingScreenState extends State<SettingScreen>
                               ],
                               onChanged: (Locale? newLocale) async {
                                 if (newLocale != null) {
-                                  await localeProvider.setLocale(newLocale);
+                                  await localeProvider.setLocale(context, newLocale);
                                   if (mounted) {
                                     setState(() {}); // Refresh UI
                                   }
@@ -676,8 +680,7 @@ class _SettingScreenState extends State<SettingScreen>
                           ),
                           const SizedBox(height: 24),
                           Text(
-                            SafetyInstructionsLocalizations.of(context)
-                                .safetyInstructionsTitle,
+                            'safety_instructions_title'.tr(),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
@@ -685,16 +688,11 @@ class _SettingScreenState extends State<SettingScreen>
                             ),
                           ),
                           const SizedBox(height: 12),
-                          ...SafetyInstructionsLocalizations.of(context)
-                              .safetyInstructions
-                              .asMap()
-                              .entries
-                              .map((entry) {
-                            final index = entry.key;
-                            final instruction = entry.value;
+
+                          ...List.generate(9, (index) {
+                            final instruction = 'safety_instructions.${index + 1}'.tr();
                             return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              padding: const EdgeInsets.symmetric(vertical: 4.0),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -702,9 +700,7 @@ class _SettingScreenState extends State<SettingScreen>
                                     '${index + 1}. ',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.black87,
+                                      color: isDark ? Colors.white : Colors.black87,
                                     ),
                                   ),
                                   Expanded(
@@ -712,16 +708,15 @@ class _SettingScreenState extends State<SettingScreen>
                                       instruction,
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black87,
+                                        color: isDark ? Colors.white : Colors.black87,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             );
-                          }).toList(),
+                          }),
+
                         ],
                       ),
                     ),

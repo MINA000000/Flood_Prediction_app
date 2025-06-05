@@ -1,31 +1,31 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'package:weather_app/firebase_options.dart';
 import 'package:weather_app/providers/locale_provider.dart';
 import 'package:weather_app/providers/theme_provider.dart';
 import 'package:weather_app/providers/vote_provider.dart';
-import 'package:weather_app/screens/login_screen.dart';
-import 'package:weather_app/master_page.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:weather_app/providers/weather_provider.dart';
 import 'package:weather_app/providers/auth_provider.dart' as myAuth;
+
+import 'package:weather_app/screens/login_screen.dart';
+import 'package:weather_app/master_page.dart';
 import 'package:weather_app/screens/admin_support_screen.dart';
-import 'package:weather_app/screens/safety_instructions_localizations.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize providers and load persisted settings
   final themeProvider = ThemeProvider();
   final localeProvider = LocaleProvider();
-  await themeProvider.loadTheme(); // Load theme from shared_preferences
-  await localeProvider.loadLocale(); // Load locale from shared_preferences
+  await themeProvider.loadTheme();
+  await localeProvider.loadLocale();
 
   runApp(
     EasyLocalization(
@@ -34,21 +34,11 @@ void main() async {
       fallbackLocale: const Locale('en'),
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider<WeatherProvider>(
-            create: (_) => WeatherProvider(),
-          ),
-          ChangeNotifierProvider<myAuth.AuthProvider>(
-            create: (_) => myAuth.AuthProvider(),
-          ),
-          ChangeNotifierProvider<VoteProvider>(
-            create: (_) => VoteProvider(),
-          ),
-          ChangeNotifierProvider<ThemeProvider>.value(
-            value: themeProvider, // Use pre-initialized provider
-          ),
-          ChangeNotifierProvider<LocaleProvider>.value(
-            value: localeProvider, // Use pre-initialized provider
-          ),
+          ChangeNotifierProvider<WeatherProvider>(create: (_) => WeatherProvider()),
+          ChangeNotifierProvider<myAuth.AuthProvider>(create: (_) => myAuth.AuthProvider()),
+          ChangeNotifierProvider<VoteProvider>(create: (_) => VoteProvider()),
+          ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
+          ChangeNotifierProvider<LocaleProvider>.value(value: localeProvider),
         ],
         child: const MyApp(),
       ),
@@ -64,14 +54,6 @@ class MyApp extends StatelessWidget {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
-          // Easy localization and custom localization
-          localizationsDelegates: [
-            ...context.localizationDelegates, // Include easy_localization delegates
-            SafetyInstructionsLocalizations.delegate, // Add custom delegate
-          ],
-          supportedLocales: context.supportedLocales,
-          locale: Provider.of<LocaleProvider>(context).locale, // Use LocaleProvider
-          // App configuration
           debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
           theme: ThemeData.light(useMaterial3: true),
@@ -90,6 +72,9 @@ class MyApp extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
           ),
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: Provider.of<LocaleProvider>(context).locale,
           home: const AuthWrapper(),
         );
       },
@@ -105,10 +90,9 @@ class AuthWrapper extends StatelessWidget {
     final authProvider = Provider.of<myAuth.AuthProvider>(context);
 
     if (authProvider.user != null) {
-      if (authProvider.isAdmin) {
-        return const AdminSupportScreen();
-      }
-      return const MasterPage();
+      return authProvider.isAdmin
+          ? const AdminSupportScreen()
+          : const MasterPage();
     } else {
       return const LoginScreen();
     }
