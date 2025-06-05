@@ -115,5 +115,19 @@
   "send_reset_link": "Send Reset Link",
   "reset_password_email_sent": "Password reset email sent. Please check your inbox.",
   "reset_password_failed": "Failed to send reset email. Please try again.",
-  "forgot_password": "Forgot Password?"
+  "forgot_password": "Forgot Password?",
+  "video": "Video",
+  "play": "Play",
+  "pause": "Pause",
+  "safety_instructions": [
+    "Stay away from low-lying areas, valleys, and waterways as they are most prone to flooding.",
+    "Do not cross closed or flooded roads or bridges, as the current may be strong and invisible.",
+    "Continuously follow weather forecasts and meteorological warnings.",
+    "Evacuate your home if ordered to do so and head to safe locations or designated shelters.",
+    "Avoid touching or approaching wet or fallen electrical wires to prevent electric shock.",
+    "Turn off electricity, gas, and water sources before leaving the home.",
+    "Avoid driving on flooded roads, as water may reach the engine, causing the vehicle to stall or be swept away by currents.",
+    "Keep emergency supplies such as water, dry food, a flashlight, extra batteries, and emergency medications.",
+    "Stay calm, avoid panic, and keep away from sources of danger."
+  ]
 }
