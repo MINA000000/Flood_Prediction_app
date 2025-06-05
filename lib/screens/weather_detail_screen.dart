@@ -8,7 +8,7 @@ class WeatherDetailScreen extends StatelessWidget {
   final String weather;
   final IconData icon;
   final double floodRisk;
-  final Map<String, dynamic> weatherData; // Added to pass full weather data
+  final Map<String, dynamic> weatherData;
 
   const WeatherDetailScreen({
     super.key,
@@ -48,7 +48,7 @@ class WeatherDetailScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
-          DateFormat('EEEE, MMM d', context.locale.languageCode).format(date),
+          DateFormat('EEE, MMM d', context.locale.languageCode).format(date),
           style: TextStyle(
             color: isDark
                 ? theme.colorScheme.onSurface
@@ -77,165 +77,104 @@ class WeatherDetailScreen extends StatelessWidget {
           ),
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                   Icon(
                     icon,
-                    size: 120,
+                    size: 100,
                     color: _getWeatherIconColor(weather, isDark),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   Text(
                     '${temp.toStringAsFixed(1)}°C',
-                    style: theme.textTheme.displayLarge?.copyWith(
+                    style: theme.textTheme.headlineLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   Directionality(
                     textDirection: isArabic
                         ? lol.TextDirection.rtl
                         : lol.TextDirection.ltr,
                     child: Text(
                       context.tr(_mapWeatherCondition(weather)),
-                      style: theme.textTheme.headlineMedium?.copyWith(
+                      style: theme.textTheme.titleLarge?.copyWith(
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  _buildDetailCard(
-                    context,
-                    title: 'flood_risk'.tr(),
-                    value: '${(floodRisk * 100).toStringAsFixed(1)}%',
-                    icon: Icons.water_drop,
-                    color: floodColor,
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      WeatherDetailTile(
+                        title: 'flood_risk'.tr(),
+                        value: '${(floodRisk * 100).toStringAsFixed(1)}%',
+                        icon: Icons.water_drop,
+                        color: floodColor,
+                      ),
+                      WeatherDetailTile(
+                        title: 'feels_like'.tr(),
+                        value: '$feelsLike°C',
+                        icon: Icons.thermostat,
+                        color: theme.colorScheme.primary,
+                      ),
+                      WeatherDetailTile(
+                        title: 'humidity'.tr(),
+                        value: '$humidity%',
+                        icon: Icons.opacity,
+                        color: theme.colorScheme.primary,
+                      ),
+                      WeatherDetailTile(
+                        title: 'wind_speed.0'.tr(),
+                        value: '$windSpeed m/s',
+                        icon: Icons.air,
+                        color: theme.colorScheme.primary,
+                      ),
+                      WeatherDetailTile(
+                        title: 'pressure'.tr(),
+                        value: '$pressure hPa',
+                        icon: Icons.compress,
+                        color: theme.colorScheme.primary,
+                      ),
+                      WeatherDetailTile(
+                        title: 'visibility'.tr(),
+                        value: '$visibility km',
+                        icon: Icons.visibility,
+                        color: theme.colorScheme.primary,
+                      ),
+                      WeatherDetailTile(
+                        title: 'sunrise'.tr(),
+                        value: sunrise,
+                        icon: Icons.wb_sunny,
+                        color: theme.colorScheme.primary,
+                      ),
+                      WeatherDetailTile(
+                        title: 'sunset'.tr(),
+                        value: sunset,
+                        icon: Icons.nights_stay,
+                        color: theme.colorScheme.primary,
+                      ),
+                      WeatherDetailTile(
+                        title: 'date'.tr(),
+                        value: DateFormat('MMM d, y', context.locale.languageCode).format(date),
+                        icon: Icons.calendar_today,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
-                  _buildDetailCard(
-                    context,
-                    title: 'feels_like'.tr(),
-                    value: '$feelsLike°C',
-                    icon: Icons.thermostat,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailCard(
-                    context,
-                    title: 'humidity'.tr(),
-                    value: '$humidity%',
-                    icon: Icons.opacity,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailCard(
-                    context,
-                    title: 'wind_speed'.tr(),
-                    value: '$windSpeed m/s',
-                    icon: Icons.air,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailCard(
-                    context,
-                    title: 'pressure'.tr(),
-                    value: '$pressure hPa',
-                    icon: Icons.compress,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailCard(
-                    context,
-                    title: 'visibility'.tr(),
-                    value: '$visibility km',
-                    icon: Icons.visibility,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailCard(
-                    context,
-                    title: 'sunrise'.tr(),
-                    value: sunrise,
-                    icon: Icons.wb_sunny,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailCard(
-                    context,
-                    title: 'sunset'.tr(),
-                    value: sunset,
-                    icon: Icons.nights_stay,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailCard(
-                    context,
-                    title: 'date'.tr(),
-                    value: DateFormat('MMMM d, y', context.locale.languageCode)
-                        .format(date),
-                    icon: Icons.calendar_today,
-                    color: theme.colorScheme.primary,
-                  ),
                 ],
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDetailCard(
-    BuildContext context, {
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      color: isDark
-          ? theme.colorScheme.surface.withOpacity(0.6)
-          : theme.colorScheme.surface.withOpacity(0.3),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -294,5 +233,68 @@ class WeatherDetailScreen extends StatelessWidget {
       default:
         return isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     }
+  }
+}
+
+class WeatherDetailTile extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const WeatherDetailTile({
+    Key? key,
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.45, // Increased from 0.4 to 0.45
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Increased padding
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16), // Slightly larger border radius
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withOpacity(0.2), // More pronounced shadow
+            blurRadius: 6, // Increased blur radius
+            offset: const Offset(0, 3), // Slightly larger offset
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 24, color: color), // Increased icon size from 20 to 24
+          const SizedBox(width: 12), // Increased spacing from 8 to 12
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith( // Changed from bodySmall to titleSmall
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500, // Added slight weight for emphasis
+                  ),
+                ),
+                const SizedBox(height: 4), // Added small vertical spacing
+                Text(
+                  value,
+                  style: theme.textTheme.titleMedium?.copyWith( // Changed from bodyMedium to titleMedium
+                    fontWeight: FontWeight.w700, // Bolder text
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
