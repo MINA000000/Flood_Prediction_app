@@ -110,6 +110,7 @@ class PredictScreen extends StatelessWidget {
                         icon: _getWeatherIcon(current['weather'][0]['main']),
                         isCurrent: true,
                         floodRisk: floodRisk,
+                        weatherData: current, // Pass full weather data
                       );
                     },
                   ),
@@ -131,6 +132,7 @@ class PredictScreen extends StatelessWidget {
                             icon:
                                 _getWeatherIcon(forecast['weather'][0]['main']),
                             floodRisk: floodRisk,
+                            weatherData: forecast, // Pass full weather data
                           );
                         },
                       );
@@ -153,6 +155,7 @@ class PredictScreen extends StatelessWidget {
     required IconData icon,
     bool isCurrent = false,
     double floodRisk = 0.0,
+    required Map<String, dynamic> weatherData, // Added parameter
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -191,103 +194,104 @@ class PredictScreen extends StatelessWidget {
               weather: weather,
               icon: icon,
               floodRisk: floodRisk,
+              weatherData: weatherData, // Pass weather data to detail screen
             ),
           ),
         );
       },
       child: Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      color: Colors.transparent,
-      shadowColor: theme.shadowColor.withOpacity(0.3),
-      child: Container(
-        decoration: BoxDecoration(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        elevation: 8,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: floodColor.withOpacity(0.5), width: 1.2),
-          gradient: backgroundGradient,
         ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  isCurrent
-                      ? 'now'.tr()
-                      : _isSameDay(date, DateTime.now())
-                          ? 'today'.tr()
-                          : DateFormat('EEEE', context.locale.languageCode)
+        color: Colors.transparent,
+        shadowColor: theme.shadowColor.withOpacity(0.3),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: floodColor.withOpacity(0.5), width: 1.2),
+            gradient: backgroundGradient,
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isCurrent
+                        ? 'now'.tr()
+                        : _isSameDay(date, DateTime.now())
+                            ? 'today'.tr()
+                            : DateFormat('EEEE', context.locale.languageCode)
                               .format(date),
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                  _buildFloodRiskIndicator(floodRisk, isDark, context),
+                ],
+              ),
+              Text(
+                DateFormat('MMM d', context.locale.languageCode).format(date),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: secondaryTextColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Icon(
+                    icon,
+                    size: 48,
+                    color: iconColor,
+                  ),
+                  Text(
+                    '${temp.toStringAsFixed(1)}°C',
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Directionality(
+                textDirection:
+                    isArabic ? lol.TextDirection.rtl : lol.TextDirection.ltr,
+                child: Text(
+                  context.tr(_mapWeatherCondition(weather)),
+                  style: theme.textTheme.titleMedium?.copyWith(
                     color: textColor,
                   ),
                 ),
-                _buildFloodRiskIndicator(floodRisk, isDark, context),
-              ],
-            ),
-            Text(
-              DateFormat('MMM d', context.locale.languageCode).format(date),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: secondaryTextColor,
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Icon(
-                  icon,
-                  size: 48,
-                  color: iconColor,
-                ),
-                Text(
-                  '${temp.toStringAsFixed(1)}°C',
-                  style: theme.textTheme.displaySmall?.copyWith(
+              const SizedBox(height: 8),
+              LinearProgressIndicator(
+                value: floodRisk,
+                backgroundColor: isDark
+                    ? theme.colorScheme.surfaceContainer
+                    : theme.colorScheme.surfaceContainerLowest,
+                valueColor: AlwaysStoppedAnimation<Color>(floodColor),
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              const SizedBox(height: 4),
+              Directionality(
+                textDirection:
+                    isArabic ? lol.TextDirection.rtl : lol.TextDirection.ltr,
+                child: Text(
+                  '${'flood_risk'.tr()} $formattedFloodRisk%',
+                  style: TextStyle(
+                    color: floodColor,
                     fontWeight: FontWeight.bold,
-                    color: textColor,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Directionality(
-              textDirection:
-                  isArabic ? lol.TextDirection.rtl : lol.TextDirection.ltr,
-              child: Text(
-                context.tr(_mapWeatherCondition(weather)),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: textColor,
-                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: floodRisk,
-              backgroundColor: isDark
-                  ? theme.colorScheme.surfaceContainer
-                  : theme.colorScheme.surfaceContainerLowest,
-              valueColor: AlwaysStoppedAnimation<Color>(floodColor),
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            const SizedBox(height: 4),
-            Directionality(
-              textDirection:
-                  isArabic ? lol.TextDirection.rtl : lol.TextDirection.ltr,
-              child: Text(
-                '${'flood_risk'.tr()} $formattedFloodRisk%',
-                style: TextStyle(
-                  color: floodColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
+            ],
           ),
         ),
       ),

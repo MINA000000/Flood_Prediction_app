@@ -8,6 +8,7 @@ class WeatherDetailScreen extends StatelessWidget {
   final String weather;
   final IconData icon;
   final double floodRisk;
+  final Map<String, dynamic> weatherData; // Added to pass full weather data
 
   const WeatherDetailScreen({
     super.key,
@@ -16,6 +17,7 @@ class WeatherDetailScreen extends StatelessWidget {
     required this.weather,
     required this.icon,
     required this.floodRisk,
+    required this.weatherData,
   });
 
   @override
@@ -24,6 +26,23 @@ class WeatherDetailScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final isArabic = context.locale.languageCode == 'ar';
     final floodColor = _getFloodColor(floodRisk, isDark);
+
+    // Extract additional weather details
+    final humidity = weatherData['main']?['humidity']?.toString() ?? 'N/A';
+    final windSpeed = weatherData['wind']?['speed']?.toStringAsFixed(1) ?? 'N/A';
+    final pressure = weatherData['main']?['pressure']?.toString() ?? 'N/A';
+    final visibility = weatherData['visibility'] != null
+        ? (weatherData['visibility'] / 1000).toStringAsFixed(1)
+        : 'N/A';
+    final feelsLike = weatherData['main']?['feels_like']?.toStringAsFixed(1) ?? 'N/A';
+    final sunrise = weatherData['sys']?['sunrise'] != null
+        ? DateFormat('h:mm a', context.locale.languageCode).format(
+            DateTime.fromMillisecondsSinceEpoch(weatherData['sys']['sunrise'] * 1000))
+        : 'N/A';
+    final sunset = weatherData['sys']?['sunset'] != null
+        ? DateFormat('h:mm a', context.locale.languageCode).format(
+            DateTime.fromMillisecondsSinceEpoch(weatherData['sys']['sunset'] * 1000))
+        : 'N/A';
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -95,6 +114,62 @@ class WeatherDetailScreen extends StatelessWidget {
                     value: '${(floodRisk * 100).toStringAsFixed(1)}%',
                     icon: Icons.water_drop,
                     color: floodColor,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailCard(
+                    context,
+                    title: 'feels_like'.tr(),
+                    value: '$feelsLike°C',
+                    icon: Icons.thermostat,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailCard(
+                    context,
+                    title: 'humidity'.tr(),
+                    value: '$humidity%',
+                    icon: Icons.opacity,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailCard(
+                    context,
+                    title: 'wind_speed'.tr(),
+                    value: '$windSpeed m/s',
+                    icon: Icons.air,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailCard(
+                    context,
+                    title: 'pressure'.tr(),
+                    value: '$pressure hPa',
+                    icon: Icons.compress,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailCard(
+                    context,
+                    title: 'visibility'.tr(),
+                    value: '$visibility km',
+                    icon: Icons.visibility,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailCard(
+                    context,
+                    title: 'sunrise'.tr(),
+                    value: sunrise,
+                    icon: Icons.wb_sunny,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailCard(
+                    context,
+                    title: 'sunset'.tr(),
+                    value: sunset,
+                    icon: Icons.nights_stay,
+                    color: theme.colorScheme.primary,
                   ),
                   const SizedBox(height: 16),
                   _buildDetailCard(
