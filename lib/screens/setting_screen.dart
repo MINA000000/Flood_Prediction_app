@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart'; // Added chewie import
+import 'package:chewie/chewie.dart'; 
 import 'package:weather_app/providers/theme_provider.dart';
 import 'package:weather_app/providers/locale_provider.dart';
 import 'package:weather_app/providers/auth_provider.dart' as myAuth;
