@@ -130,5 +130,7 @@
     "7": "Avoid driving on flooded roads, as water may reach the engine, causing the vehicle to stall or be swept away by currents.",
     "8": "Keep emergency supplies such as water, dry food, a flashlight, extra batteries, and emergency medications.",
     "9": "Stay calm, avoid panic, and keep away from sources of danger."
-  }
+  },
+  "flood_status": "Flood Status",
+  "no_flood_data": "No flood data available"
 }
