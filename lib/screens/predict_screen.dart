@@ -18,9 +18,7 @@ class PredictScreen extends StatelessWidget {
         title: Consumer<WeatherProvider>(
           builder: (context, provider, _) {
             return Text(
-              provider.cityName != null
-                  ? 'weather_forecast_city'.tr(args: [provider.cityName!])
-                  : 'weather_forecast'.tr(),
+              'weather_forecast_alexandria'.tr(),
               style: TextStyle(
                 color: isDark
                     ? theme.colorScheme.onSurface
@@ -225,7 +223,7 @@ class PredictScreen extends StatelessWidget {
                         : _isSameDay(date, DateTime.now())
                             ? 'today'.tr()
                             : DateFormat('EEEE', context.locale.languageCode)
-                              .format(date),
+                                .format(date),
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: textColor,

@@ -132,5 +132,6 @@
     "9": "Stay calm, avoid panic, and keep away from sources of danger."
   },
   "flood_status": "Flood Status",
-  "no_flood_data": "No flood data available"
+  "no_flood_data": "No flood data available",
+  "weather_forecast_alexandria": "Alexandria Weather Forecast"
 }
