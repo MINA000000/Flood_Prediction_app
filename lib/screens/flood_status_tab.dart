@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FloodStatusTab extends StatelessWidget {
   const FloodStatusTab({super.key});
 
-  // Helper to generate gradient colors based on index for visual distinction
   LinearGradient _getCardGradient(int index) {
     final colors = [
       [Colors.blue.shade300, Colors.blue.shade600],
@@ -18,6 +19,36 @@ class FloodStatusTab extends StatelessWidget {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
+  }
+
+  Future<double> getFloodPrediction(Map<String, dynamic> predictionData) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://minanasser.pythonanywhere.com/predict'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'Year': DateTime.now().year,
+          'Month': DateTime.now().month,
+          'Max_Temp': predictionData['Max_Temp'] ?? 0.0,
+          'Min_Temp': predictionData['Min_Temp'] ?? 0.0,
+          'Rainfall': predictionData['Rainfall'] ?? 0.0,
+          'Relative_Humidity': predictionData['Relative_Humidity'] ?? 0.0,
+          'Wind_Speed': predictionData['Wind_Speed'] ?? 0.0,
+          'Cloud_Coverage': predictionData['Cloud_Coverage'] ?? 0.0,
+          'Bright_Sunshine': predictionData['Bright_Sunshine'] ?? 0.0,
+          'ALT': predictionData['ALT'] ?? 250.0,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return (data['flood_prediction'] as num).toDouble();
+      }
+      return 0.0;
+    } catch (e) {
+      debugPrint('Flood prediction error: $e');
+      return 0.0;
+    }
   }
 
   @override
@@ -69,10 +100,12 @@ class FloodStatusTab extends StatelessWidget {
                           .collection('today_flood_status')
                           .snapshots(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const Center(
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.blue),
                             ),
                           );
                         }
@@ -80,7 +113,9 @@ class FloodStatusTab extends StatelessWidget {
                           return Text(
                             'Error loading flood data: ${snapshot.error}',
                             style: TextStyle(
-                              color: isDark ? Colors.redAccent : Colors.red.shade700,
+                              color: isDark
+                                  ? Colors.redAccent
+                                  : Colors.red.shade700,
                               fontSize: 16,
                             ),
                           );
@@ -90,7 +125,9 @@ class FloodStatusTab extends StatelessWidget {
                             'no_flood_data'.tr(),
                             style: TextStyle(
                               fontSize: 18,
-                              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                              color: isDark
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
                               fontStyle: FontStyle.italic,
                             ),
                           );
@@ -104,29 +141,41 @@ class FloodStatusTab extends StatelessWidget {
                           separatorBuilder: (context, index) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 12.0),
                             child: Divider(
-                              color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                              color: isDark
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade300,
                               thickness: 1.5,
                             ),
                           ),
                           itemBuilder: (context, index) {
-                            final data = docs[index].data() as Map<String, dynamic>;
+                            final data =
+                                docs[index].data() as Map<String, dynamic>;
                             final date = data['date']?.toString() ?? 'N/A';
-                            final floodVotes = data['floodVotes']?.toString() ?? 'N/A';
-                            final totalVotes = data['totalVotes']?.toString() ?? 'N/A';
-                            final predictionData =
-                                data['predictionData'] as Map<String, dynamic>? ?? {};
+                            final floodVotes =
+                                data['floodVotes']?.toString() ?? 'N/A';
+                            final totalVotes =
+                                data['totalVotes']?.toString() ?? 'N/A';
+                            final predictionData = data['predictionData']
+                                    as Map<String, dynamic>? ??
+                                {};
                             final weatherData =
-                                data['weatherData'] as Map<String, dynamic>? ?? {};
-                            final createdAt =
-                                (data['createdAt'] as Timestamp?)?.toDate().toString() ??
-                                    'N/A';
+                                data['weatherData'] as Map<String, dynamic>? ??
+                                    {};
+                            final createdAt = (data['createdAt'] as Timestamp?)
+                                    ?.toDate()
+                                    .toString() ??
+                                'N/A';
                             final lastUpdated =
-                                (data['lastUpdated'] as Timestamp?)?.toDate().toString() ??
+                                (data['lastUpdated'] as Timestamp?)
+                                        ?.toDate()
+                                        .toString() ??
                                     'N/A';
                             final location =
                                 data['location'] as Map<String, dynamic>? ?? {};
-                            final city = location['city']?.toString() ?? 'Alexandria';
-                            final country = location['country']?.toString() ?? 'Egypt';
+                            final city =
+                                location['city']?.toString() ?? 'Alexandria';
+                            final country =
+                                location['country']?.toString() ?? 'Egypt';
 
                             return Card(
                               elevation: 6,
@@ -148,10 +197,12 @@ class FloodStatusTab extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
                                             date,
@@ -163,7 +214,8 @@ class FloodStatusTab extends StatelessWidget {
                                           ),
                                           Icon(
                                             Icons.flood_rounded,
-                                            color: Colors.white.withOpacity(0.8),
+                                            color:
+                                                Colors.white.withOpacity(0.8),
                                             size: 24,
                                           ),
                                         ],
@@ -190,10 +242,12 @@ class FloodStatusTab extends StatelessWidget {
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.15),
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               'Flood Votes: $floodVotes / $totalVotes',
@@ -216,14 +270,16 @@ class FloodStatusTab extends StatelessWidget {
                                               'City: $city',
                                               style: TextStyle(
                                                 fontSize: 14,
-                                                color: Colors.white.withOpacity(0.9),
+                                                color: Colors.white
+                                                    .withOpacity(0.9),
                                               ),
                                             ),
                                             Text(
                                               'Country: $country',
                                               style: TextStyle(
                                                 fontSize: 14,
-                                                color: Colors.white.withOpacity(0.9),
+                                                color: Colors.white
+                                                    .withOpacity(0.9),
                                               ),
                                             ),
                                           ],
@@ -241,63 +297,106 @@ class FloodStatusTab extends StatelessWidget {
                                         ),
                                         iconColor: Colors.white,
                                         collapsedIconColor: Colors.white,
-                                        childrenPadding: const EdgeInsets.all(12),
-                                        backgroundColor: Colors.white.withOpacity(0.1),
+                                        childrenPadding:
+                                            const EdgeInsets.all(12),
+                                        backgroundColor:
+                                            Colors.white.withOpacity(0.1),
                                         children: [
+                                          FutureBuilder<double>(
+                                            future: getFloodPrediction(
+                                                predictionData),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const CircularProgressIndicator(
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                          Color>(Colors.white),
+                                                );
+                                              }
+                                              if (snapshot.hasError) {
+                                                return Text(
+                                                  'Error: ${snapshot.error}',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.white
+                                                        .withOpacity(0.9),
+                                                  ),
+                                                );
+                                              }
+                                              return Text(
+                                                'Flood Prediction: ${(snapshot.data != null ? (snapshot.data!.toDouble() * 100).toStringAsFixed(2) : 'N/A')}%',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white
+                                                      .withOpacity(0.9),
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              );
+                                            },
+                                          ),
                                           Text(
                                             'Altitude: ${predictionData['ALT']?.toString() ?? 'N/A'} m',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Bright Sunshine: ${predictionData['Bright_Sunshine']?.toString() ?? 'N/A'} hours',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Cloud Coverage: ${predictionData['Cloud_Coverage']?.toString() ?? 'N/A'}%',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Max Temp: ${predictionData['Max_Temp']?.toString() ?? 'N/A'}°C',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Min Temp: ${predictionData['Min_Temp']?.toString() ?? 'N/A'}°C',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Rainfall: ${predictionData['Rainfall']?.toString() ?? 'N/A'} mm',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Relative Humidity: ${predictionData['Relative_Humidity']?.toString() ?? 'N/A'}%',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Wind Speed: ${predictionData['Wind_Speed']?.toString() ?? 'N/A'} m/s',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                         ],
@@ -313,49 +412,57 @@ class FloodStatusTab extends StatelessWidget {
                                         ),
                                         iconColor: Colors.white,
                                         collapsedIconColor: Colors.white,
-                                        childrenPadding: const EdgeInsets.all(12),
-                                        backgroundColor: Colors.white.withOpacity(0.1),
+                                        childrenPadding:
+                                            const EdgeInsets.all(12),
+                                        backgroundColor:
+                                            Colors.white.withOpacity(0.1),
                                         children: [
                                           Text(
                                             'Current Temp: ${weatherData['current_temp']?.toString() ?? 'N/A'}°C',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Pressure: ${weatherData['pressure']?.toString() ?? 'N/A'} hPa',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Visibility: ${(weatherData['visibility'] != null ? weatherData['visibility'] / 1000 : 'N/A')} km',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Weather Condition: ${weatherData['weather_condition']?.toString() ?? 'N/A'}',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Weather Description: ${weatherData['weather_description']?.toString() ?? 'N/A'}',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                           Text(
                                             'Wind Direction: ${weatherData['wind_direction']?.toString() ?? 'N/A'}°',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                             ),
                                           ),
                                         ],
