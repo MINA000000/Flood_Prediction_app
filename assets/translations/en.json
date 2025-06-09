@@ -133,5 +133,6 @@
   },
   "flood_status": "Flood Status",
   "no_flood_data": "No flood data available",
-  "weather_forecast_alexandria": "Alexandria Weather Forecast"
+  "weather_forecast_alexandria": "Alexandria Weather Forecast",
+  "flood_history": "Flood hisotry"
 }

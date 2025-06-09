@@ -2,12 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart'; 
+import 'package:chewie/chewie.dart';
 import 'package:weather_app/providers/theme_provider.dart';
 import 'package:weather_app/providers/locale_provider.dart';
 import 'package:weather_app/providers/auth_provider.dart' as myAuth;
 import 'package:weather_app/screens/login_screen.dart';
-import 'flood_status_tab.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -25,21 +24,20 @@ class _SettingScreenState extends State<SettingScreen>
   bool _isUpdating = false;
   late TabController _tabController;
   late VideoPlayerController _videoController;
-  late ChewieController _chewieController; // Added ChewieController
+  late ChewieController _chewieController;
   String? _videoError;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 4, vsync: this); // Reduced length to 4
     _videoController = VideoPlayerController.asset('assets/videos/alertVideo.mp4')
       ..initialize().then((_) {
-        // Initialize ChewieController after VideoPlayerController is ready
         setState(() {
           _chewieController = ChewieController(
             videoPlayerController: _videoController,
-            autoInitialize: true, // Auto-initialize the video
-            autoPlay: false, // Set to false to match your original play button logic
+            autoInitialize: true,
+            autoPlay: false,
             looping: false,
             errorBuilder: (context, errorMessage) {
               return Center(
@@ -53,7 +51,6 @@ class _SettingScreenState extends State<SettingScreen>
                 ),
               );
             },
-            // Customize controls to match your theme
             materialProgressColors: ChewieProgressColors(
               playedColor: Colors.blue,
               handleColor: Colors.blueAccent,
@@ -83,7 +80,7 @@ class _SettingScreenState extends State<SettingScreen>
     _confirmPasswordController.dispose();
     _tabController.dispose();
     _videoController.dispose();
-    _chewieController.dispose(); // Dispose ChewieController
+    _chewieController.dispose();
     super.dispose();
   }
 
@@ -133,8 +130,7 @@ class _SettingScreenState extends State<SettingScreen>
               Tab(text: 'update_name'.tr()),
               Tab(text: 'update_password'.tr()),
               Tab(text: 'video'.tr()),
-              Tab(text: 'flood_status'.tr()),
-            ],
+            ], // Removed Flood Status tab
           ),
         ),
         body: TabBarView(
@@ -627,7 +623,7 @@ class _SettingScreenState extends State<SettingScreen>
                                   ? AspectRatio(
                                       aspectRatio: _videoController.value.aspectRatio,
                                       child: Chewie(
-                                        controller: _chewieController, // Use Chewie widget
+                                        controller: _chewieController,
                                       ),
                                     )
                                   : const Center(
@@ -643,10 +639,10 @@ class _SettingScreenState extends State<SettingScreen>
                                       setState(() {
                                         if (_videoController.value.isPlaying) {
                                           _videoController.pause();
-                                          _chewieController.pause(); // Sync with Chewie
+                                          _chewieController.pause();
                                         } else {
                                           _videoController.play();
-                                          _chewieController.play(); // Sync with Chewie
+                                          _chewieController.play();
                                         }
                                       });
                                     },
@@ -714,9 +710,7 @@ class _SettingScreenState extends State<SettingScreen>
                 ],
               ),
             ),
-            // Flood Status Tab
-            const FloodStatusTab(),
-          ],
+          ], // Removed FloodStatusTab
         ),
       ),
     );

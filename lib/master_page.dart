@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:weather_app/screens/community_screen.dart';
+import 'package:weather_app/screens/flood_status_tab.dart';
 import 'package:weather_app/screens/predict_screen.dart';
 import 'package:weather_app/screens/setting_screen.dart';
 import 'package:weather_app/screens/weather_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MasterPage extends StatefulWidget {
   const MasterPage({super.key});
@@ -19,6 +21,7 @@ class _MasterPageState extends State<MasterPage> {
     const WeatherScreen(),
     const PredictScreen(),
     const CommunityScreen(),
+    const FloodStatusTab(), // Add FloodStatusTab to the screens list
     const SettingScreen(),
   ];
   int selectedScreen = 0;
@@ -46,7 +49,7 @@ class _MasterPageState extends State<MasterPage> {
           // Store token with device ID
           await FirebaseFirestore.instance
               .collection('users_tokens')
-              .doc(token) // Use token as document ID
+              .doc(token)
               .set({
             'fcmToken': token,
             'userId': user.uid,
@@ -66,7 +69,7 @@ class _MasterPageState extends State<MasterPage> {
         if (user != null) {
           await FirebaseFirestore.instance
               .collection('users_tokens')
-              .doc(token) // Use new token as document ID
+              .doc(token)
               .set({
             'fcmToken': token,
             'userId': user.uid,
@@ -103,6 +106,7 @@ class _MasterPageState extends State<MasterPage> {
         fixedColor: Colors.amber,
         unselectedItemColor: Colors.blue,
         currentIndex: selectedScreen,
+        type: BottomNavigationBarType.fixed, // Ensure all items are visible
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -115,6 +119,10 @@ class _MasterPageState extends State<MasterPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
             label: 'Community',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.flood_rounded), // Icon for Flood Status
+            label: 'Flood Status', // Label for Flood Status
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
