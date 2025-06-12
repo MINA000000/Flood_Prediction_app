@@ -149,18 +149,18 @@ class WeatherDetailScreen extends StatelessWidget {
                         icon: Icons.visibility,
                         color: theme.colorScheme.primary,
                       ),
-                      WeatherDetailTile(
-                        title: 'sunrise'.tr(),
-                        value: sunrise,
-                        icon: Icons.wb_sunny,
-                        color: theme.colorScheme.primary,
-                      ),
-                      WeatherDetailTile(
-                        title: 'sunset'.tr(),
-                        value: sunset,
-                        icon: Icons.nights_stay,
-                        color: theme.colorScheme.primary,
-                      ),
+                      // WeatherDetailTile(
+                      //   title: 'sunrise'.tr(),
+                      //   value: sunrise,
+                      //   icon: Icons.wb_sunny,
+                      //   color: theme.colorScheme.primary,
+                      // ),
+                      // WeatherDetailTile(
+                      //   title: 'sunset'.tr(),
+                      //   value: sunset,
+                      //   icon: Icons.nights_stay,
+                      //   color: theme.colorScheme.primary,
+                      // ),
                       WeatherDetailTile(
                         title: 'date'.tr(),
                         value: DateFormat('MMM d, y', context.locale.languageCode).format(date),
