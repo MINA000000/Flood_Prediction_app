@@ -559,6 +559,51 @@ class _AdminSupportScreenState extends State<AdminSupportScreen>
                                         );
                                       },
                                     ),
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        final String? messageId =
+                                            data['messageId'];
+                                        if (messageId == null) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'Cannot delete message: No message ID found'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+                                        deleteMessage(
+                                            context, messageId);
+                                      },
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: isDarkMode
+                                            ? Colors.black
+                                            : Colors.white,
+                                      ),
+                                      label: Text(
+                                        'Delete message'.tr(),
+                                        style: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.redAccent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
                                   ],
                                 ),
                               ],
