@@ -31,6 +31,31 @@ class _AdminSupportScreenState extends State<AdminSupportScreen>
     super.dispose();
   }
 
+  Future<void> deleteMessage(BuildContext context, String messageId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('GP3_chats')
+          .doc('Alexandria')
+          .collection('group_chat')
+          .doc(messageId)
+          .delete();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Message deleted successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete message: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -137,7 +162,7 @@ class _AdminSupportScreenState extends State<AdminSupportScreen>
                     final userDoc = snapshot.data!.docs[index];
                     final userId = userDoc.id;
                     final userData = userDoc.data() as Map<String, dynamic>;
-                    final userName = userData['name'] ?? 'Unknown User';
+                    final userName = userData['displayName'] ?? 'Unknown User';
                     final userEmail = userData['email'] ?? 'No Email';
                     final supportChatId = 'support_$userId';
 
