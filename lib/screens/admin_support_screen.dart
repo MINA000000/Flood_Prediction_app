@@ -456,7 +456,7 @@ class _AdminSupportScreenState extends State<AdminSupportScreen>
                                 ),
                                 const SizedBox(height: 16),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     ElevatedButton.icon(
                                       onPressed: () {
@@ -465,7 +465,7 @@ class _AdminSupportScreenState extends State<AdminSupportScreen>
                                         if (reportedUserId == null) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
-                                            SnackBar(
+                                            const SnackBar(
                                               content: Text(
                                                   'Cannot warn user: No user ID found'),
                                               backgroundColor: Colors.red,
@@ -559,7 +559,15 @@ class _AdminSupportScreenState extends State<AdminSupportScreen>
                                         );
                                       },
                                     ),
-                                    ElevatedButton.icon(
+                                    
+                                  ],
+                                ),
+                                const SizedBox(height: 15,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    
+                                ElevatedButton.icon(
                                       onPressed: () {
                                         final String? messageId =
                                             data['messageId'];
